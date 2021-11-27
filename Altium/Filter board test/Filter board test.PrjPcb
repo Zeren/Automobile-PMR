@@ -35,6 +35,12 @@ OutputPath=
 LogFolderPath=
 ManagedProjectGUID=
 IncludeDesignInRelease=0
+CrossRefSheetStyle=1
+CrossRefLocationStyle=1
+CrossRefPorts=3
+CrossRefCrossSheets=1
+CrossRefSheetEntries=0
+CrossRefFollowFromMainSettings=1
 
 [Preferences]
 PrefsVaultGUID=
@@ -75,23 +81,6 @@ GenerateClassCluster=0
 DocumentUniqueId=JIZYZKTJ
 
 [Document3]
-DocumentPath=MEZIFREKVENCE.SchDoc
-AnnotationEnabled=1
-AnnotateStartValue=1
-AnnotationIndexControlEnabled=0
-AnnotateSuffix=
-AnnotateScope=All
-AnnotateOrder=-1
-DoLibraryUpdate=1
-DoDatabaseUpdate=1
-ClassGenCCAutoEnabled=1
-ClassGenCCAutoRoomEnabled=1
-ClassGenNCAutoScope=None
-DItemRevisionGUID=
-GenerateClassCluster=0
-DocumentUniqueId=GDQTGSMS
-
-[Document4]
 DocumentPath=Filter board test.PcbDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -108,18 +97,39 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=QJGPPWRX
 
+[Document4]
+DocumentPath=outjob.OutJob
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=1
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=
+
 [ProjectVariant1]
 UniqueID=649092C8-56B5-41CC-BF5B-46F405EF5DED
 Description=Zapojeni
 AllowFabrication=0
 ParameterCount=0
-VariationCount=6
+VariationCount=10
 Variation1=Designator=C?|UniqueId=\UXPUQCFK|Kind=1|AlternatePart= 
 Variation2=Designator=C?|UniqueId=\POBTOSYU|Kind=1|AlternatePart= 
 Variation3=Designator=C?|UniqueId=\CZDTECWA|Kind=1|AlternatePart= 
 Variation4=Designator=C?|UniqueId=\DJBLKPXR|Kind=1|AlternatePart= 
 Variation5=Designator=C?|UniqueId=\EAAHEYIS|Kind=1|AlternatePart= 
 Variation6=Designator=C?|UniqueId=\YBAIAFWA|Kind=1|AlternatePart= 
+Variation7=Designator=R?|UniqueId=\TWMDPACY|Kind=1|AlternatePart= 
+Variation8=Designator=R?|UniqueId=\DYKNRWOH|Kind=1|AlternatePart= 
+Variation9=Designator=R?|UniqueId=\ARHVSNMK|Kind=1|AlternatePart= 
+Variation10=Designator=R?|UniqueId=\OHBWEHFN|Kind=1|AlternatePart= 
 ParamVariationCount=0
 
 [Configuration1]
