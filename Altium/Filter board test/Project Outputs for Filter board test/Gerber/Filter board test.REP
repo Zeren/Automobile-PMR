@@ -2,28 +2,6 @@
 FileName = Filter board test.GBR
 AutoAperture = True
 *************************************************************
-Generating : Mechanical 1
-      File : Filter board test.GM1
-
-    Adding Layer      : Mechanical 1
-
-
-Used DCodes :
-    D13
-*************************************************************
-
-*************************************************************
-Generating : Bottom Overlay
-      File : Filter board test.GBO
-
-    Adding Layer      : Bottom Overlay
-
-
-Used DCodes :
-    D35
-*************************************************************
-
-*************************************************************
 Generating : Bottom Solder
       File : Filter board test.GBS
 
@@ -35,11 +13,11 @@ Generating : Bottom Solder
 
 
 Used DCodes :
-    D18
     D19
     D20
     D21
-    D34
+    D22
+    D36
 *************************************************************
 
 *************************************************************
@@ -62,6 +40,71 @@ Used DCodes :
     D19
     D20
     D21
+    D22
+*************************************************************
+
+*************************************************************
+Generating : Mechanical 1
+      File : Filter board test.GM1
+
+    Adding Layer      : Mechanical 1
+
+
+Used DCodes :
+    D13
+*************************************************************
+
+*************************************************************
+Generating : Bottom Layer
+      File : Filter board test.GBL
+
+    Adding Layer      : Bottom Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D32
+    D33
+    D34
+    D35
+*************************************************************
+
+*************************************************************
+Generating : Top Layer
+      File : Filter board test.GTL
+
+    Adding Layer      : Top Layer
+
+    Adding Layer      : Multi-Layer
+
+
+Used DCodes :
+    D13
+    D23
+    D24
+    D25
+    D26
+    D27
+    D28
+    D29
+    D30
+    D31
+    D32
+    D33
+    D34
+    D35
+*************************************************************
+
+*************************************************************
+Generating : Bottom Overlay
+      File : Filter board test.GBO
+
+    Adding Layer      : Bottom Overlay
+
+
+Used DCodes :
+    D27
 *************************************************************
 
 *************************************************************
@@ -76,46 +119,5 @@ Used DCodes :
     D11
     D12
     D13
-*************************************************************
-
-*************************************************************
-Generating : Bottom Layer
-      File : Filter board test.GBL
-
-    Adding Layer      : Bottom Layer
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D30
-    D31
-    D32
-    D33
-*************************************************************
-
-*************************************************************
-Generating : Top Layer
-      File : Filter board test.GTL
-
-    Adding Layer      : Top Layer
-
-    Adding Layer      : Multi-Layer
-
-
-Used DCodes :
-    D13
-    D22
-    D23
-    D24
-    D25
-    D26
-    D27
-    D28
-    D29
-    D30
-    D31
-    D32
-    D33
 *************************************************************
 

@@ -1,6 +1,6 @@
 DRC Rules Export File for PCB: B:\Git\Automobile-PMR\Altium\Filter board test\Filter board test.PcbDoc
 RuleKind=Clearance|RuleName=Clearance_1|Scope=Board|Minimum=19.69
-RuleKind=Width|RuleName=50 ohm|Scope=Board|Minimum=40.55
+RuleKind=Width|RuleName=50 ohm|Scope=Board|Minimum=54.33
 RuleKind=MinimumAnnularRing|RuleName=MinimumAnnularRing|Scope=Board|Minimum=5.12
 RuleKind=ShortCircuit|RuleName=ShortCircuit|Scope=Board|Allowed=0
 RuleKind=SolderMaskExpansion|RuleName=SolderMaskExpansion|Scope=Board|Minimum=1.97
