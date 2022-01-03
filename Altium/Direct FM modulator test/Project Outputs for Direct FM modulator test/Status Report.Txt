@@ -1,0 +1,12 @@
+Output: NC Drill Files
+Type  : NC Drill
+From  : PCB Document [Direct FM modulator test.PcbDoc]
+   Generated File[Direct FM modulator test.TXT]
+   Generated File[Direct FM modulator test.LDP]
+   Generated File[Direct FM modulator test.DRR]
+
+
+Files Generated   : 3
+Documents Printed : 0
+
+Finished Output Generation At 23:38:27 On 10.12.2021
