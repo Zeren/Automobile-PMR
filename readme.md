@@ -2,8 +2,8 @@
 
 # Connection to R124
 
-## Connection in 124 A-1
-Connection as R112. 
+## Connection in R124 A-1
+### Connection as R112. 
 
 | Cont. |                | Cont. |                     | Cont. |                |
 |-------|----------------|-------|---------------------|-------|----------------|
@@ -17,6 +17,21 @@ Connection as R112.
 | a8    |                | b8    |                     | c8    |                |
 | a9    |                | b9    |                     | c9    |                |
 | a0    |                | b0    |                     | c0    |                |
+
+### Connection as R123. 
+
+| Cont. |                     | Cont. |                  | Cont. |                  |
+|-------|---------------------|-------|------------------|-------|------------------|
+| a1    |                     | b1    | +26V <br/> Black | c1    |                  |
+| a2    |                     | b2    |                  | c2    | GND <br/> Blue   |
+| a3    |                     | b3    |                  | c3    |                  |
+| a4    |                     | b4    |                  | c4    |                  |
+| a5    |                     | b5    |                  | c5    |                  |
+| a6    |                     | b6    |                  | c6    |                  |
+| a7    |                     | b7    |                  | c7    |                  |
+| a8    |                     | b8    |                  | c8    |                  |
+| a9    |                     | b9    |                  | c9    | PTT<br/> Brown   |
+| a0    | Speaker <br/> Green | b0    | MIC+ <br/> Red   | c0    | MIC- <br/>Orange |
 
 ## M12 Connector
 
@@ -88,3 +103,37 @@ Connection as R112.
 | 10   | 94.8    | 23   | 146.2   | 36   | 233.6   |
 | 11   | 97.4    | 24   | 151.4   | 37   | 241.8   |
 | 12   | 100.0   | 25   | 156.7   | 38   | 250.3   |
+
+# R124 Notes
+
+## Connectors
+
+### R124 A-1
+
+| Cont. |                                              | Cont. |                      | Cont. |               |
+|-------|----------------------------------------------|-------|----------------------|-------|---------------|
+| a1    | NC                                           | b1    | +26V                 | c1    | NC            |
+| a2    | NC                                           | b2    | R112 Speaker         | c2    | GND           |
+| a3    | R112 PTT                                     | b3    | R112 MIC-            | c3    | MIC+          |
+| a4    | A-2 R112 Speaker                             | b4    | A-2 R123 MIC+        | c4    | A-2 R112 MIC+ |
+| a5    | A-2 R123 Speaker                             | b5    | A-2 R123 MIC-        | c5    | A-2 R112 MIC- |
+| a6    | Tangenta Speaker                             | b6    | Tangenta Intercom PB | c6    | Tangenta GND  |
+| a7    | Tangenta MIC+                                | b7    | Tangenta MIC-        | c7    | Tangenta PTT  |
+| a8    | Intercom Speaker for <br/>A-2, A-3, A-4, A-5 | b8    | Intercom PB          | c8    | GND           |
+| a9    | +22V for <br/>A-2, A-3, A-4, A-5             | b9    | Intercom MIC to PA   | c9    | R123 PTT      |
+| a0    | R123 Speaker                                 | b0    | R123 MIC+            | c0    | R123 MIC-     |
+
+Intercom MIC to PA - Amplified microphone
+
+### R124 A-2
+
+| Cont. |                                  | Cont. |                  | 
+|-------|----------------------------------|-------|------------------|
+| a1    | A-1 R112 MIC+                    | b1    | A-1 R123 MIC+    |
+| a2    | A-1 R112 MIC-                    | b2    | A-1 R123 MIC-    |
+| a3    | Tangenta PTT                     | b3    | Tangenta MIC+    |
+| a4    | Intercom MIC to PA               | b4    | Tangenta MIC-    |
+| a5    | GND                              | b5    | A-1 R112 Speaker |
+| a6    | +22V for <br/>A-2, A-3, A-4, A-5 | b6    | A-1 R112 PTT     |
+| a7    | Tangenta Speaker                 | b7    | A-1 R123 Speaker |
+| a8    | Intercom Speaker                 | b8    | A-1 R123 PTT     |
