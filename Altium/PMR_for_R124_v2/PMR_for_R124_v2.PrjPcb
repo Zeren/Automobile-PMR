@@ -339,6 +339,23 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=MYBQPGMQ
 
+[Document18]
+DocumentPath=outjob.OutJob
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=-1
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=0
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=
+
 [ProjectVariant1]
 UniqueId=19d1f386-a7cf-49f4-82e1-b745af04dac8
 Description=Osazeni
@@ -349,6 +366,66 @@ Variation1=Designator=R?|UniqueId=\DVCWZKZE\DXSCORCJ|Kind=1|AlternatePart=
 Variation2=Designator=L?|UniqueId=\FVJMIXQF\PBULUOWN\WNNNRFQJ|Kind=1|AlternatePart=
 Variation3=Designator=C?|UniqueId=\FVJMIXQF\WWIKAEDY|Kind=1|AlternatePart=
 ParamVariationCount=0
+
+[GeneratedDocument1]
+DocumentPath=Project Outputs for PMR_for_R124_v2\NC Drill\PMR_for_R124_v2.DRR
+DItemRevisionGUID=
+
+[GeneratedDocument2]
+DocumentPath=Project Outputs for PMR_for_R124_v2\Gerber\PMR_for_R124_v2.EXTREP
+DItemRevisionGUID=
+
+[GeneratedDocument3]
+DocumentPath=Project Outputs for PMR_for_R124_v2\Gerber\PMR_for_R124_v2.G1
+DItemRevisionGUID=
+
+[GeneratedDocument4]
+DocumentPath=Project Outputs for PMR_for_R124_v2\Gerber\PMR_for_R124_v2.G2
+DItemRevisionGUID=
+
+[GeneratedDocument5]
+DocumentPath=Project Outputs for PMR_for_R124_v2\Gerber\PMR_for_R124_v2.GBL
+DItemRevisionGUID=
+
+[GeneratedDocument6]
+DocumentPath=Project Outputs for PMR_for_R124_v2\Gerber\PMR_for_R124_v2.GBO
+DItemRevisionGUID=
+
+[GeneratedDocument7]
+DocumentPath=Project Outputs for PMR_for_R124_v2\Gerber\PMR_for_R124_v2.GBS
+DItemRevisionGUID=
+
+[GeneratedDocument8]
+DocumentPath=Project Outputs for PMR_for_R124_v2\Gerber\PMR_for_R124_v2.GM1
+DItemRevisionGUID=
+
+[GeneratedDocument9]
+DocumentPath=Project Outputs for PMR_for_R124_v2\Gerber\PMR_for_R124_v2.GTL
+DItemRevisionGUID=
+
+[GeneratedDocument10]
+DocumentPath=Project Outputs for PMR_for_R124_v2\Gerber\PMR_for_R124_v2.GTO
+DItemRevisionGUID=
+
+[GeneratedDocument11]
+DocumentPath=Project Outputs for PMR_for_R124_v2\Gerber\PMR_for_R124_v2.GTS
+DItemRevisionGUID=
+
+[GeneratedDocument12]
+DocumentPath=Project Outputs for PMR_for_R124_v2\NC Drill\PMR_for_R124_v2.LDP
+DItemRevisionGUID=
+
+[GeneratedDocument13]
+DocumentPath=Project Outputs for PMR_for_R124_v2\Gerber\PMR_for_R124_v2.REP
+DItemRevisionGUID=
+
+[GeneratedDocument14]
+DocumentPath=Project Outputs for PMR_for_R124_v2\Gerber\PMR_for_R124_v2.RUL
+DItemRevisionGUID=
+
+[GeneratedDocument15]
+DocumentPath=Project Outputs for PMR_for_R124_v2\NC Drill\PMR_for_R124_v2.TXT
+DItemRevisionGUID=
 
 [Parameter1]
 Name=Date
@@ -1048,6 +1125,7 @@ Type147=1
 Type148=1
 Type149=1
 Type150=1
+Type151=1
 
 [Difference Levels]
 Type1=1
@@ -1131,6 +1209,7 @@ Type78=1
 Type79=1
 Type80=1
 Type81=1
+Type82=1
 
 [Electrical Rules Check]
 Type1=1
@@ -1287,6 +1366,13 @@ Type151=2
 Type152=1
 Type153=1
 Type154=0
+Type155=0
+Type156=0
+Type157=0
+Type158=0
+Type159=0
+Type160=0
+Type161=0
 
 [ERC Connection Matrix]
 L1=NNNNNNNNNNNWNNNWW
