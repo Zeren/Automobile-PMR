@@ -48,7 +48,12 @@ UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart2_tx;
 
 /* USER CODE BEGIN PV */
+volatile uint8_t current_channel = 3; // Index 3 odpovídá PMR kanálu 4 (446.043750 MHz)
+volatile uint8_t current_ctcss = 25;  // Index 25 odpovídá CTCSS tónu 156.7 Hz
+volatile uint8_t is_tx = 0;           // Stavový příznak transceiveru (0 = RX, 1 = TX)
 
+RDA1846_Reg30_t rda_settings = {0};
+RDA1846_ctcss ctcss_settings = {0};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -100,7 +105,26 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  // 1. Inicializace základních parametrů registru 0x30
+  rda_settings.bits.pdn_reg = 1;        // Power down pin softwarově povolen
+  rda_settings.bits.channel_mode = 0;   // 12.5 kHz kanálová rozteč (standard pro PMR446)
+  rda_settings.bits.sq_on = 1;          // Squelch aktivní
 
+  // 2. Inicializace sub-audia (CTCSS)
+  ctcss_settings.tx_CTCSS = RDA1846_CTCSS_INNER_CTCSS_EN;
+  ctcss_settings.rx_CTCSS = RDA1846_CTCSS_INNER_CTCSS_EN;
+  ctcss_settings.tone = CTCSS_Tones[current_ctcss];
+
+  // 3. Konfigurace referenčních hodin (předpoklad 26 MHz krystal, nutno ověřit dle HW)
+  RDA1846_SetReferenceClock(26000);
+
+  // 4. Nastavení frekvenčního syntezátoru a tónu
+  RDA1846_SetFrequency(PMR446_Frequencies[current_channel]);
+
+  // 5. Uvedení do výchozího přijímacího stavu
+  HAL_GPIO_WritePin(PA_BIAS_ON_GPIO_Port, PA_BIAS_ON_Pin, GPIO_PIN_RESET);
+  RDA1846_SetRxMode(&rda_settings, &ctcss_settings);
+  is_tx = 0;
 
   /* USER CODE END 2 */
 
@@ -111,6 +135,35 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+    GPIO_PinState ptt_state = HAL_GPIO_ReadPin(PTT_GPIO_Port, PTT_Pin);
+
+    // Přechod RX -> TX (PTT stisknuto = log 0)
+    if (ptt_state == GPIO_PIN_RESET && !is_tx) {
+        // Nejprve aktivovat bias a přepnout T/R switch do vysílací cesty
+        HAL_GPIO_WritePin(PA_BIAS_ON_GPIO_Port, PA_BIAS_ON_Pin, GPIO_PIN_SET);
+
+        // Čas na náběh PA a ustálení mechanického/polovodičového RF přepínače
+        HAL_Delay(10);
+
+        // Zapnutí modulátoru a vysílání v RDA1846
+        RDA1846_SetTxMode(&rda_settings, &ctcss_settings);
+        is_tx = 1;
+    }
+    // Přechod TX -> RX (PTT uvolněno = log 1)
+    else if (ptt_state == GPIO_PIN_SET && is_tx) {
+        // Nejprve deaktivovat vysílání na straně transceiveru (vypnutí LO / modulátoru)
+        RDA1846_SetRxMode(&rda_settings, &ctcss_settings);
+
+        // Zpoždění pro pokles VF výkonu na nulu (ochrana před přepnutím pod zátěží)
+        HAL_Delay(10);
+
+        // Vypnutí PA biasu a přepnutí T/R switche na stranu LNA
+        HAL_GPIO_WritePin(PA_BIAS_ON_GPIO_Port, PA_BIAS_ON_Pin, GPIO_PIN_RESET);
+        is_tx = 0;
+    }
+
+    // Omezení rychlosti hlavní smyčky a základní debouncing PTT signálu
+    HAL_Delay(20);
   }
   /* USER CODE END 3 */
 }
