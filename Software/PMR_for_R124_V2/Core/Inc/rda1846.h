@@ -3,7 +3,7 @@
 
 #include "stm32g0xx_hal.h"
 
-// I2C 7-bitová adresa (při SEN = High). Pro SEN = Low by to bylo 0x71.
+// I2C 7-bitová adresa (při SEN = High) 0x2E. Pro SEN = Low by to bylo 0x71.
 #define RDA1846_I2C_ADDR  0x2E
 
 // Paging konstanty (stránkování nadadresových registrů)
@@ -87,6 +87,12 @@ typedef struct {
 #define FLAG_LOW_VOLTAGE       (1 << 5)
 #define FLAG_PLL_LOCK          (1 << 6)
 #define FLAG_RSSI_HIGH         (1 << 7)
+
+// ---------------------------------------------------------
+// EXTERN DEKLARACE PRO SDÍLENÍ MEZI MODULY
+// ---------------------------------------------------------
+extern const uint32_t PMR446_Frequencies[16];
+extern const uint16_t CTCSS_Tones[39];
 
 // Global UART Handle
 extern UART_HandleTypeDef huart2;

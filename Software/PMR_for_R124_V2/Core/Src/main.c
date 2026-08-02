@@ -22,6 +22,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "rda1846.h"
+#include <stdio.h>
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -63,12 +65,18 @@ static void MX_DMA_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
-
+void Debug_Print(const char *msg);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+/**
+ * @brief Pomocná funkce pro odesílání logů přes USART2.
+ * @param msg Ukazatel na null-terminated řetězec.
+ */
+void Debug_Print(const char *msg) {
+    HAL_UART_Transmit(&huart2, (uint8_t *)msg, strlen(msg), 100);
+}
 /* USER CODE END 0 */
 
 /**
@@ -105,6 +113,11 @@ int main(void)
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
 
+  char debug_msg[128];
+  Debug_Print("\r\n=======================================\r\n");
+  Debug_Print("--- PMR446 Transceiver Booting ---\r\n");
+  Debug_Print("=======================================\r\n");
+
   // 1. Inicializace základních parametrů registru 0x30
   rda_settings.bits.pdn_reg = 1;        // Power down pin softwarově povolen
   rda_settings.bits.channel_mode = 0;   // 12.5 kHz kanálová rozteč (standard pro PMR446)
@@ -115,55 +128,93 @@ int main(void)
   ctcss_settings.rx_CTCSS = RDA1846_CTCSS_INNER_CTCSS_EN;
   ctcss_settings.tone = CTCSS_Tones[current_ctcss];
 
-  // 3. Konfigurace referenčních hodin (předpoklad 26 MHz krystal, nutno ověřit dle HW)
-  RDA1846_SetReferenceClock(26000);
+  // Test komunikace I2C přes prvotní zápis registru 0x30
+  HAL_StatusTypeDef i2c_stat = RDA1846_WriteRegister(0x30, rda_settings.value);
+  if (i2c_stat != HAL_OK) {
+      Debug_Print("[ERROR] I2C komunikace s RDA1846 selhala! Zkontrolujte SENB pin a pull-up rezistory.\r\n");
+      // Zde lze implementovat fallback nebo soft reset sběrnice
+  } else {
+      Debug_Print("[OK] I2C komunikace navazana.\r\n");
+  }
+
+  // 3. Konfigurace referenčních hodin (25 MHz krystal)
+  RDA1846_SetReferenceClock(25000);
+  Debug_Print("[INFO] Referencni oscilator nastaven na 25 MHz.\r\n");
 
   // 4. Nastavení frekvenčního syntezátoru a tónu
-  RDA1846_SetFrequency(PMR446_Frequencies[current_channel]);
+  uint32_t target_freq = PMR446_Frequencies[current_channel];
+  snprintf(debug_msg, sizeof(debug_msg), "[INFO] Nastavuji frekvenci: %lu Hz (Kanal %d)\r\n", target_freq, current_channel + 1);
+  Debug_Print(debug_msg);
+  RDA1846_SetFrequency(target_freq);
 
   // 5. Uvedení do výchozího přijímacího stavu
   HAL_GPIO_WritePin(PA_BIAS_ON_GPIO_Port, PA_BIAS_ON_Pin, GPIO_PIN_RESET);
   RDA1846_SetRxMode(&rda_settings, &ctcss_settings);
   is_tx = 0;
+  Debug_Print("[INFO] Inicializace dokoncena. System prechazi do RX rezimu.\r\n");
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
+  // Proměnné pro neblokující debouncing PTT
+  static uint32_t last_debounce_time = 0;
+  static GPIO_PinState last_ptt_state = GPIO_PIN_SET; // Předpoklad pull-up pinu (nestisknuto = 1)
+  static GPIO_PinState debounced_ptt_state = GPIO_PIN_SET;
+
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-    GPIO_PinState ptt_state = HAL_GPIO_ReadPin(PTT_GPIO_Port, PTT_Pin);
 
-    // Přechod RX -> TX (PTT stisknuto = log 0)
-    if (ptt_state == GPIO_PIN_RESET && !is_tx) {
-        // Nejprve aktivovat bias a přepnout T/R switch do vysílací cesty
-        HAL_GPIO_WritePin(PA_BIAS_ON_GPIO_Port, PA_BIAS_ON_Pin, GPIO_PIN_SET);
+    // Načtení aktuálního fyzického stavu pinu
+    GPIO_PinState current_ptt_state = HAL_GPIO_ReadPin(PTT_GPIO_Port, PTT_Pin);
 
-        // Čas na náběh PA a ustálení mechanického/polovodičového RF přepínače
-        HAL_Delay(10);
-
-        // Zapnutí modulátoru a vysílání v RDA1846
-        RDA1846_SetTxMode(&rda_settings, &ctcss_settings);
-        is_tx = 1;
-    }
-    // Přechod TX -> RX (PTT uvolněno = log 1)
-    else if (ptt_state == GPIO_PIN_SET && is_tx) {
-        // Nejprve deaktivovat vysílání na straně transceiveru (vypnutí LO / modulátoru)
-        RDA1846_SetRxMode(&rda_settings, &ctcss_settings);
-
-        // Zpoždění pro pokles VF výkonu na nulu (ochrana před přepnutím pod zátěží)
-        HAL_Delay(10);
-
-        // Vypnutí PA biasu a přepnutí T/R switche na stranu LNA
-        HAL_GPIO_WritePin(PA_BIAS_ON_GPIO_Port, PA_BIAS_ON_Pin, GPIO_PIN_RESET);
-        is_tx = 0;
+    // Detekce změny stavu na pinu
+    if (current_ptt_state != last_ptt_state) {
+        last_debounce_time = HAL_GetTick();
     }
 
-    // Omezení rychlosti hlavní smyčky a základní debouncing PTT signálu
-    HAL_Delay(20);
+    // Vyhodnocení stability pinu (20 ms timeout pro odfiltrování zákmitů a EMI)
+    if ((HAL_GetTick() - last_debounce_time) > 20) {
+
+        // Pokud je potvrzený stav odlišný od toho, který zná stavový automat
+        if (current_ptt_state != debounced_ptt_state) {
+            debounced_ptt_state = current_ptt_state;
+
+            // PTT stisknuto (log 0) -> Přechod do TX
+            if (debounced_ptt_state == GPIO_PIN_RESET && !is_tx) {
+                Debug_Print("[ACTION] PTT stisknuto. Prepinam do TX...\r\n");
+
+                HAL_GPIO_WritePin(PA_BIAS_ON_GPIO_Port, PA_BIAS_ON_Pin, GPIO_PIN_SET);
+                HAL_Delay(10); // Hardware delay pro ustálení VF přepínače a náběh PA
+
+                RDA1846_SetTxMode(&rda_settings, &ctcss_settings);
+                is_tx = 1;
+
+                Debug_Print("[INFO] TX rezim aktivni.\r\n");
+            }
+            // PTT uvolněno (log 1) -> Přechod do RX
+            else if (debounced_ptt_state == GPIO_PIN_SET && is_tx) {
+                Debug_Print("[ACTION] PTT uvolneno. Prepinam do RX...\r\n");
+
+                RDA1846_SetRxMode(&rda_settings, &ctcss_settings);
+
+                HAL_Delay(10); // Hardware delay pro bezpečný pokles výkonu modulátoru
+                HAL_GPIO_WritePin(PA_BIAS_ON_GPIO_Port, PA_BIAS_ON_Pin, GPIO_PIN_RESET);
+                is_tx = 0;
+
+                Debug_Print("[INFO] RX rezim aktivni.\r\n");
+            }
+        }
+    }
+
+    last_ptt_state = current_ptt_state;
+
+    // Zde je nyní bezpečné zpracovávat další neblokující události (vyčítání RSSI, UI, atd.)
+
   }
   /* USER CODE END 3 */
 }
