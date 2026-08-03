@@ -122,6 +122,8 @@ int main(void)
   rda_settings.bits.pdn_reg = 1;        // Power down pin softwarově povolen
   rda_settings.bits.channel_mode = 0;   // 12.5 kHz kanálová rozteč (standard pro PMR446)
   rda_settings.bits.sq_on = 1;          // Squelch aktivní
+  rda_settings.bits.chip_cal_en = 1;    // KRIZOVÁ OPRAVA: Povolení kalibrace VCO
+  rda_settings.bits.others = 1;
 
   // 2. Inicializace sub-audia (CTCSS)
   ctcss_settings.tx_CTCSS = RDA1846_CTCSS_INNER_CTCSS_EN;
@@ -136,11 +138,15 @@ int main(void)
   } else {
       Debug_Print("[OK] I2C komunikace navazana.\r\n");
   }
-
+  // MAGIC INIT
+  Debug_Print("[INFO] Nahravam tovarni inicializacni sekvenci (DSP/AGC/PLL)...\r\n");
+  RDA1846_Init();
+  RDA1846_WriteRegister(0x30, rda_settings.value);
+  HAL_Delay(100);
   // 3. Konfigurace referenčních hodin (25 MHz krystal)
-  RDA1846_SetReferenceClock(25000);
-  Debug_Print("[INFO] Referencni oscilator nastaven na 25 MHz.\r\n");
-
+  RDA1846_SetReferenceClock(26000);
+  Debug_Print("[INFO] Referencni oscilator nastaven na 26 MHz.\r\n");
+  HAL_Delay(100);
   // 4. Nastavení frekvenčního syntezátoru a tónu
   uint32_t target_freq = PMR446_Frequencies[current_channel];
   snprintf(debug_msg, sizeof(debug_msg), "[INFO] Nastavuji frekvenci: %lu Hz (Kanal %d)\r\n", target_freq, current_channel + 1);

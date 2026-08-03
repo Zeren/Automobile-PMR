@@ -3,8 +3,8 @@
 
 #include "stm32g0xx_hal.h"
 
-// I2C 7-bitová adresa (při SEN = High) 0x2E. Pro SEN = Low by to bylo 0x71.
-#define RDA1846_I2C_ADDR  0x2E
+// I2C 7-bitová adresa (při SEN = Low)
+#define RDA1846_I2C_ADDR  0x71
 
 // Paging konstanty (stránkování nadadresových registrů)
 #define RDA1846_PAGE_REG   0x7F
@@ -98,6 +98,7 @@ extern const uint16_t CTCSS_Tones[39];
 extern UART_HandleTypeDef huart2;
 extern I2C_HandleTypeDef hi2c1;
 
+void RDA1846_Init(void);
 HAL_StatusTypeDef RDA1846_WriteRegister(uint16_t reg, uint16_t value);
 uint16_t RDA1846_ReadRegister(uint8_t reg);
 void RDA1846_SetFrequency(uint32_t freq);
