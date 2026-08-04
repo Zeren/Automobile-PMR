@@ -87,7 +87,19 @@ typedef struct {
 #define FLAG_LOW_VOLTAGE       (1 << 5)
 #define FLAG_PLL_LOCK          (1 << 6)
 #define FLAG_RSSI_HIGH         (1 << 7)
+// Správné adresy stavových registrů
+#define RDA1846_FLAG_REG 0x5C
+#define RDA1846_RSSI_REG 0x5F
+#define RDA1846_VSSI_REG 0x60
 
+// Správné mapování bitů v registru 0x5C (Flag)
+#define FLAG_VOX               (1 << 0)
+#define FLAG_SQUELCH_OPEN      (1 << 1)
+#define FLAG_CTCSS_DETECTED    (1 << 2)
+#define FLAG_INVERT_DET        (1 << 7)
+#define FLAG_TXON_RF           (1 << 9)
+#define FLAG_RXON_RF           (1 << 10)
+#define FLAG_DTMF_IDLE         (1 << 12)
 // ---------------------------------------------------------
 // EXTERN DEKLARACE PRO SDÍLENÍ MEZI MODULY
 // ---------------------------------------------------------
@@ -114,5 +126,6 @@ uint16_t RDA1846_ReadRSSI(void);
 uint16_t RDA1846_ReadVSSI(void);
 uint16_t RDA1846_ReadFlags(void);
 void RDA1846_SendFlagsUART_DMA(uint16_t flags);
+void RDA1846_SetSquelchThresholds(int8_t open_dbm, int8_t shut_dbm);
 
 #endif // RDA1846_H

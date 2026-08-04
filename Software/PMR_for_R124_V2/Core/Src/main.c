@@ -4,16 +4,6 @@
   * @file           : main.c
   * @brief          : Main program body
   ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2025 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
@@ -26,21 +16,6 @@
 #include <string.h>
 /* USER CODE END Includes */
 
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
-
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-
-/* USER CODE END PD */
-
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
-
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
 DMA_HandleTypeDef hdma_i2c1_tx;
@@ -50,8 +25,8 @@ UART_HandleTypeDef huart2;
 DMA_HandleTypeDef hdma_usart2_tx;
 
 /* USER CODE BEGIN PV */
-volatile uint8_t current_channel = 3; // Index 3 odpovídá PMR kanálu 4 (446.043750 MHz)
-volatile uint8_t current_ctcss = 25;  // Index 25 odpovídá CTCSS tónu 156.7 Hz
+volatile uint8_t current_channel = 4; // Index 3 odpovídá PMR kanálu 4 (446.043750 MHz)
+volatile uint8_t current_ctcss = 5;  // Index 25 odpovídá CTCSS tónu 156.7 Hz
 volatile uint8_t is_tx = 0;           // Stavový příznak transceiveru (0 = RX, 1 = TX)
 
 RDA1846_Reg30_t rda_settings = {0};
@@ -70,90 +45,56 @@ void Debug_Print(const char *msg);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-/**
- * @brief Pomocná funkce pro odesílání logů přes USART2.
- * @param msg Ukazatel na null-terminated řetězec.
- */
 void Debug_Print(const char *msg) {
     HAL_UART_Transmit(&huart2, (uint8_t *)msg, strlen(msg), 100);
 }
 /* USER CODE END 0 */
 
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
 int main(void)
 {
-
-  /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
-
-  /* MCU Configuration--------------------------------------------------------*/
-
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
-
-  /* Configure the system clock */
   SystemClock_Config();
-
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
-
-  /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_I2C1_Init();
   MX_USART2_UART_Init();
-  /* USER CODE BEGIN 2 */
 
+  /* USER CODE BEGIN 2 */
   char debug_msg[128];
   Debug_Print("\r\n=======================================\r\n");
   Debug_Print("--- PMR446 Transceiver Booting ---\r\n");
   Debug_Print("=======================================\r\n");
 
-  // 1. Inicializace základních parametrů registru 0x30
-  rda_settings.bits.pdn_reg = 1;        // Power down pin softwarově povolen
-  rda_settings.bits.channel_mode = 0;   // 12.5 kHz kanálová rozteč (standard pro PMR446)
-  rda_settings.bits.sq_on = 1;          // Squelch aktivní
-  rda_settings.bits.chip_cal_en = 1;    // KRIZOVÁ OPRAVA: Povolení kalibrace VCO
-  rda_settings.bits.others = 1;
+  rda_settings.bits.pdn_reg = 1;
+  rda_settings.bits.channel_mode = 0;
+  rda_settings.bits.sq_on = 1;
+  rda_settings.bits.chip_cal_en = 1;    // Povolení kalibrace VCO
+  rda_settings.bits.others = 1;         // Nastaví bit 14 na 1 (Režim 26 MHz)
 
-  // 2. Inicializace sub-audia (CTCSS)
   ctcss_settings.tx_CTCSS = RDA1846_CTCSS_INNER_CTCSS_EN;
   ctcss_settings.rx_CTCSS = RDA1846_CTCSS_INNER_CTCSS_EN;
   ctcss_settings.tone = CTCSS_Tones[current_ctcss];
 
-  // Test komunikace I2C přes prvotní zápis registru 0x30
   HAL_StatusTypeDef i2c_stat = RDA1846_WriteRegister(0x30, rda_settings.value);
   if (i2c_stat != HAL_OK) {
-      Debug_Print("[ERROR] I2C komunikace s RDA1846 selhala! Zkontrolujte SENB pin a pull-up rezistory.\r\n");
-      // Zde lze implementovat fallback nebo soft reset sběrnice
+      Debug_Print("[ERROR] I2C komunikace s RDA1846 selhala!\r\n");
   } else {
       Debug_Print("[OK] I2C komunikace navazana.\r\n");
   }
-  // MAGIC INIT
+
   Debug_Print("[INFO] Nahravam tovarni inicializacni sekvenci (DSP/AGC/PLL)...\r\n");
   RDA1846_Init();
-  RDA1846_WriteRegister(0x30, rda_settings.value);
-  HAL_Delay(100);
-  // 3. Konfigurace referenčních hodin (25 MHz krystal)
-  RDA1846_SetReferenceClock(26000);
-  Debug_Print("[INFO] Referencni oscilator nastaven na 26 MHz.\r\n");
-  HAL_Delay(100);
-  // 4. Nastavení frekvenčního syntezátoru a tónu
+
+  RDA1846_SetReferenceClock(25000);
+
   uint32_t target_freq = PMR446_Frequencies[current_channel];
   snprintf(debug_msg, sizeof(debug_msg), "[INFO] Nastavuji frekvenci: %lu Hz (Kanal %d)\r\n", target_freq, current_channel + 1);
   Debug_Print(debug_msg);
   RDA1846_SetFrequency(target_freq);
 
-  // 5. Uvedení do výchozího přijímacího stavu
+  // Nastavení Squelch hystereze (Otevře při -113 dBm, Zavře při -116 dBm)
+    RDA1846_SetSquelchThresholds(-113, -116);
+
   HAL_GPIO_WritePin(PA_BIAS_ON_GPIO_Port, PA_BIAS_ON_Pin, GPIO_PIN_RESET);
   RDA1846_SetRxMode(&rda_settings, &ctcss_settings);
   is_tx = 0;
@@ -164,9 +105,9 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  // Proměnné pro neblokující debouncing PTT
   static uint32_t last_debounce_time = 0;
-  static GPIO_PinState last_ptt_state = GPIO_PIN_SET; // Předpoklad pull-up pinu (nestisknuto = 1)
+  static uint32_t last_telemetry_time = 0;
+  static GPIO_PinState last_ptt_state = GPIO_PIN_SET;
   static GPIO_PinState debounced_ptt_state = GPIO_PIN_SET;
 
   while (1)
@@ -175,55 +116,61 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-    // Načtení aktuálního fyzického stavu pinu
+    // --- 1. Vyhodnoceni PTT (Debounce) ---
     GPIO_PinState current_ptt_state = HAL_GPIO_ReadPin(PTT_GPIO_Port, PTT_Pin);
 
-    // Detekce změny stavu na pinu
     if (current_ptt_state != last_ptt_state) {
         last_debounce_time = HAL_GetTick();
     }
 
-    // Vyhodnocení stability pinu (20 ms timeout pro odfiltrování zákmitů a EMI)
     if ((HAL_GetTick() - last_debounce_time) > 20) {
-
-        // Pokud je potvrzený stav odlišný od toho, který zná stavový automat
         if (current_ptt_state != debounced_ptt_state) {
             debounced_ptt_state = current_ptt_state;
 
-            // PTT stisknuto (log 0) -> Přechod do TX
             if (debounced_ptt_state == GPIO_PIN_RESET && !is_tx) {
                 Debug_Print("[ACTION] PTT stisknuto. Prepinam do TX...\r\n");
-
                 HAL_GPIO_WritePin(PA_BIAS_ON_GPIO_Port, PA_BIAS_ON_Pin, GPIO_PIN_SET);
-                HAL_Delay(10); // Hardware delay pro ustálení VF přepínače a náběh PA
-
+                HAL_Delay(10);
                 RDA1846_SetTxMode(&rda_settings, &ctcss_settings);
                 is_tx = 1;
-
                 Debug_Print("[INFO] TX rezim aktivni.\r\n");
             }
-            // PTT uvolněno (log 1) -> Přechod do RX
             else if (debounced_ptt_state == GPIO_PIN_SET && is_tx) {
                 Debug_Print("[ACTION] PTT uvolneno. Prepinam do RX...\r\n");
-
                 RDA1846_SetRxMode(&rda_settings, &ctcss_settings);
-
-                HAL_Delay(10); // Hardware delay pro bezpečný pokles výkonu modulátoru
+                HAL_Delay(10);
                 HAL_GPIO_WritePin(PA_BIAS_ON_GPIO_Port, PA_BIAS_ON_Pin, GPIO_PIN_RESET);
                 is_tx = 0;
-
                 Debug_Print("[INFO] RX rezim aktivni.\r\n");
             }
         }
     }
-
     last_ptt_state = current_ptt_state;
 
-    // Zde je nyní bezpečné zpracovávat další neblokující události (vyčítání RSSI, UI, atd.)
+    // --- 2. Kontinualni telemetrie (RSSI a SQ stav) ---
+    if (!is_tx && (HAL_GetTick() - last_telemetry_time) > 500) {
+        last_telemetry_time = HAL_GetTick();
 
+        uint16_t raw_rssi = RDA1846_ReadRSSI();
+        uint16_t flags = RDA1846_ReadFlags();
+
+        // Konverze surové hodnoty z registru 0x5F (bity 9:0) na dBm dle datasheetu
+        int16_t rssi_dbm = (raw_rssi / 8) - 135;
+
+        snprintf(debug_msg, sizeof(debug_msg), "[TELEMETRY] RSSI: %d dBm (raw: %u), Flags: 0x%04X\r\n", rssi_dbm, raw_rssi, flags);
+        Debug_Print(debug_msg);
+
+        if (flags & FLAG_SQUELCH_OPEN) {
+            Debug_Print(" >>> SQUELCH OTEVREN (Nosna detekovana) <<<\r\n");
+        }
+        if (flags & FLAG_CTCSS_DETECTED) {
+            Debug_Print(" >>> CTCSS TON DETEKOVÁN <<<\r\n");
+        }
+    }
   }
   /* USER CODE END 3 */
 }
+
 
 /**
   * @brief System Clock Configuration

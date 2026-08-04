@@ -62,13 +62,17 @@ HAL_StatusTypeDef RDA1846_WriteRegister(uint16_t reg, uint16_t value) {
 }
 
 uint16_t RDA1846_ReadRegister(uint8_t reg) {
-    uint8_t txData[1] = { reg };
-    uint8_t rxData[2] = { 0 };
+    uint8_t rxData[2] = { 0, 0 };
 
-    HAL_I2C_Master_Transmit(&hi2c1, RDA1846_I2C_ADDR << 1, txData, 1, HAL_MAX_DELAY);
-    HAL_I2C_Master_Receive(&hi2c1, RDA1846_I2C_ADDR << 1, rxData, 2, HAL_MAX_DELAY);
+    // HAL_I2C_Mem_Read automaticky použije Repeated Start místo STOP condition
+    HAL_StatusTypeDef status = HAL_I2C_Mem_Read(&hi2c1, RDA1846_I2C_ADDR << 1, reg, I2C_MEMADD_SIZE_8BIT, rxData, 2, HAL_MAX_DELAY);
 
-    return ((uint16_t) rxData[0] << 8) | rxData[1];
+    if (status != HAL_OK) {
+        // V případě selhání sběrnice vrátíme 0, aby se nevyhodnotily falešné příznaky (0xFFFF)
+        return 0x0000;
+    }
+
+    return ((uint16_t)rxData[0] << 8) | rxData[1];
 }
 
 void RDA1846_Init(void) {
@@ -208,17 +212,18 @@ void RDA1846_SetCTCSS_TONE(RDA1846_ctcss *ctcss) {
 }
 
 uint16_t RDA1846_ReadRSSI(void) {
-    return RDA1846_ReadRegister(0x0B);
+    uint16_t val = RDA1846_ReadRegister(RDA1846_RSSI_REG);
+    return (val & 0x03FF); // RSSI je pouze ve spodních 10 bitech
 }
 
 uint16_t RDA1846_ReadVSSI(void) {
-    return RDA1846_ReadRegister(0x0C);
+    uint16_t val = RDA1846_ReadRegister(RDA1846_VSSI_REG);
+    return (val & 0x7FFF); // VSSI je ve spodních 15 bitech
 }
 
 uint16_t RDA1846_ReadFlags(void) {
-    return RDA1846_ReadRegister(0x0D);
+    return RDA1846_ReadRegister(RDA1846_FLAG_REG);
 }
-
 void RDA1846_SendFlagsUART_DMA(uint16_t flags) {
     int offset = 0;
     offset += snprintf(uart_tx_buffer + offset, sizeof(uart_tx_buffer), "RDA1846 Status Flags:\r\n");
@@ -235,4 +240,23 @@ void RDA1846_SendFlagsUART_DMA(uint16_t flags) {
     if (flags & FLAG_RSSI_HIGH) offset += snprintf(uart_tx_buffer + offset, sizeof(uart_tx_buffer) - offset, " - High RSSI Level Detected\r\n");
 
     HAL_UART_Transmit_DMA(&huart2, (uint8_t*) uart_tx_buffer, offset);
+}
+
+/**
+ * @brief Nastaví prahové úrovně pro otevření a zavření šumové brány.
+ *
+ * @param open_dbm  Úroveň v dBm pro OTEVŘENÍ Squelche (např. -113)
+ * @param shut_dbm  Úroveň v dBm pro ZAVŘENÍ Squelche (např. -116)
+ */
+void RDA1846_SetSquelchThresholds(int8_t open_dbm, int8_t shut_dbm) {
+    // Ochrana proti podtečení (datasheet definuje ofset 135)
+    if (open_dbm < -134) open_dbm = -134;
+    if (shut_dbm < -134) shut_dbm = -134;
+
+    // Převod na surové hodnoty zapsatelné do registrů
+    uint16_t open_reg = (open_dbm + 135) * 8;
+    uint16_t shut_reg = (shut_dbm + 135) * 8;
+
+    RDA1846_WriteRegister(0x48, open_reg);
+    RDA1846_WriteRegister(0x49, shut_reg);
 }
