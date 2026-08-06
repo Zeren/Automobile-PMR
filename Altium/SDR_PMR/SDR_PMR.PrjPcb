@@ -44,6 +44,7 @@ CrossRefPorts=3
 CrossRefCrossSheets=1
 CrossRefSheetEntries=0
 CrossRefFollowFromMainSettings=1
+CurrentVariant=Osazeni
 
 [Preferences]
 PrefsVaultGUID=
@@ -303,6 +304,19 @@ ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=
+
+[ProjectVariant1]
+UniqueId=475d752c-0aad-4116-bf74-0118f6d89662
+Description=Osazeni
+AllowFabrication=0
+ParameterCount=0
+VariationCount=5
+Variation1=Designator=R?|UniqueId=\NIJNKOAB\JPNYVFVU|Kind=1|AlternatePart=
+Variation2=Designator=R?|UniqueId=\NIJNKOAB\SMCQXKSJ|Kind=1|AlternatePart=
+Variation3=Designator=R?|UniqueId=\NIJNKOAB\RSPNQQWX|Kind=1|AlternatePart=
+Variation4=Designator=R?|UniqueId=\NIJNKOAB\RDBFHXOI|Kind=1|AlternatePart=
+Variation5=Designator=R?|UniqueId=\NIJNKOAB\ANMCLQJA|Kind=1|AlternatePart=
+ParamVariationCount=0
 
 [Configuration1]
 Name=Sources
