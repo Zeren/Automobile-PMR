@@ -57,7 +57,7 @@ AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
 AnnotateSuffix=
 AnnotateScope=All
-AnnotateOrder=-1
+AnnotateOrder=0
 DoLibraryUpdate=1
 DoDatabaseUpdate=1
 ClassGenCCAutoEnabled=1
@@ -74,7 +74,7 @@ AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
 AnnotateSuffix=
 AnnotateScope=All
-AnnotateOrder=-1
+AnnotateOrder=1
 DoLibraryUpdate=1
 DoDatabaseUpdate=1
 ClassGenCCAutoEnabled=1
@@ -108,7 +108,7 @@ AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
 AnnotateSuffix=
 AnnotateScope=All
-AnnotateOrder=-1
+AnnotateOrder=2
 DoLibraryUpdate=1
 DoDatabaseUpdate=1
 ClassGenCCAutoEnabled=1
@@ -125,7 +125,7 @@ AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
 AnnotateSuffix=
 AnnotateScope=All
-AnnotateOrder=-1
+AnnotateOrder=3
 DoLibraryUpdate=1
 DoDatabaseUpdate=1
 ClassGenCCAutoEnabled=1
@@ -133,7 +133,7 @@ ClassGenCCAutoRoomEnabled=0
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=
+DocumentUniqueId=RBPMXTQX
 
 [Document6]
 DocumentPath=Radio.SchDoc
@@ -142,7 +142,7 @@ AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
 AnnotateSuffix=
 AnnotateScope=All
-AnnotateOrder=-1
+AnnotateOrder=4
 DoLibraryUpdate=1
 DoDatabaseUpdate=1
 ClassGenCCAutoEnabled=1
@@ -159,7 +159,7 @@ AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
 AnnotateSuffix=
 AnnotateScope=All
-AnnotateOrder=-1
+AnnotateOrder=5
 DoLibraryUpdate=1
 DoDatabaseUpdate=1
 ClassGenCCAutoEnabled=1
@@ -167,7 +167,7 @@ ClassGenCCAutoRoomEnabled=0
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=
+DocumentUniqueId=COKOUHNS
 
 [Document8]
 DocumentPath=Audio_codec.SchDoc
@@ -176,7 +176,7 @@ AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
 AnnotateSuffix=
 AnnotateScope=All
-AnnotateOrder=-1
+AnnotateOrder=6
 DoLibraryUpdate=1
 DoDatabaseUpdate=1
 ClassGenCCAutoEnabled=1
@@ -227,7 +227,7 @@ AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
 AnnotateSuffix=
 AnnotateScope=All
-AnnotateOrder=-1
+AnnotateOrder=7
 DoLibraryUpdate=1
 DoDatabaseUpdate=1
 ClassGenCCAutoEnabled=1
@@ -244,7 +244,7 @@ AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
 AnnotateSuffix=
 AnnotateScope=All
-AnnotateOrder=-1
+AnnotateOrder=8
 DoLibraryUpdate=1
 DoDatabaseUpdate=1
 ClassGenCCAutoEnabled=1
@@ -261,7 +261,7 @@ AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
 AnnotateSuffix=
 AnnotateScope=All
-AnnotateOrder=-1
+AnnotateOrder=9
 DoLibraryUpdate=1
 DoDatabaseUpdate=1
 ClassGenCCAutoEnabled=1
@@ -278,7 +278,7 @@ AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
 AnnotateSuffix=
 AnnotateScope=All
-AnnotateOrder=-1
+AnnotateOrder=10
 DoLibraryUpdate=1
 DoDatabaseUpdate=1
 ClassGenCCAutoEnabled=1
@@ -305,18 +305,53 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=
 
+[Document16]
+DocumentPath=70cm_BPF.SchDoc
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=11
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=0
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=NGDZGFPR
+
+[Document17]
+DocumentPath=442MHz-450MHz_BPF.SchDoc
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=12
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=0
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=QNBQEHRH
+
 [ProjectVariant1]
 UniqueId=475d752c-0aad-4116-bf74-0118f6d89662
 Description=Osazeni
 AllowFabrication=0
 ParameterCount=0
-VariationCount=5
+VariationCount=2
 Variation1=Designator=R?|UniqueId=\NIJNKOAB\JPNYVFVU|Kind=1|AlternatePart=
-Variation2=Designator=R?|UniqueId=\NIJNKOAB\SMCQXKSJ|Kind=1|AlternatePart=
-Variation3=Designator=R?|UniqueId=\NIJNKOAB\RSPNQQWX|Kind=1|AlternatePart=
-Variation4=Designator=R?|UniqueId=\NIJNKOAB\RDBFHXOI|Kind=1|AlternatePart=
-Variation5=Designator=R?|UniqueId=\NIJNKOAB\ANMCLQJA|Kind=1|AlternatePart=
+Variation2=Designator=R?|UniqueId=\NIJNKOAB\ANMCLQJA|Kind=1|AlternatePart=
 ParamVariationCount=0
+
+[GeneratedDocument1]
+DocumentPath=Project Outputs for SDR_PMR\BOM\Bill of Materials-SDR_PMR(Osazeni).csv
+DItemRevisionGUID=
 
 [Configuration1]
 Name=Sources
