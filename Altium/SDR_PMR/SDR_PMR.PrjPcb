@@ -119,6 +119,23 @@ GenerateClassCluster=0
 DocumentUniqueId=JFANDEVN
 
 [Document5]
+DocumentPath=Power_3V3.SchDoc
+AnnotationEnabled=1
+AnnotateStartValue=1
+AnnotationIndexControlEnabled=0
+AnnotateSuffix=
+AnnotateScope=All
+AnnotateOrder=14
+DoLibraryUpdate=1
+DoDatabaseUpdate=1
+ClassGenCCAutoEnabled=1
+ClassGenCCAutoRoomEnabled=0
+ClassGenNCAutoScope=None
+DItemRevisionGUID=
+GenerateClassCluster=0
+DocumentUniqueId=YBHBJKZR
+
+[Document6]
 DocumentPath=Power_Amplifier.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -135,7 +152,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=RBPMXTQX
 
-[Document6]
+[Document7]
 DocumentPath=Radio.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -152,7 +169,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=SNIRIKMT
 
-[Document7]
+[Document8]
 DocumentPath=RF_FILTER.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -169,7 +186,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=COKOUHNS
 
-[Document8]
+[Document9]
 DocumentPath=Audio_codec.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -186,7 +203,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=SHQPEZBF
 
-[Document9]
+[Document10]
 DocumentPath=Audio_codec.Harness
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -203,7 +220,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=
 
-[Document10]
+[Document11]
 DocumentPath=Radio.Harness
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -220,7 +237,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=
 
-[Document11]
+[Document12]
 DocumentPath=Headphone_Amplifier.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -237,7 +254,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=IVOMUTAS
 
-[Document12]
+[Document13]
 DocumentPath=MCU.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -254,7 +271,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=RDMPLGOJ
 
-[Document13]
+[Document14]
 DocumentPath=PTT.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -271,7 +288,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=IBREPJAU
 
-[Document14]
+[Document15]
 DocumentPath=M12_Connector.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -288,7 +305,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=WGDYCPNL
 
-[Document15]
+[Document16]
 DocumentPath=M12_Connector.Harness
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -305,7 +322,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=
 
-[Document16]
+[Document17]
 DocumentPath=70cm_BPF.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -322,7 +339,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=NGDZGFPR
 
-[Document17]
+[Document18]
 DocumentPath=442MHz-450MHz_BPF.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -339,7 +356,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=QNBQEHRH
 
-[Document18]
+[Document19]
 DocumentPath=MCU.Harness
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -356,7 +373,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=
 
-[Document19]
+[Document20]
 DocumentPath=USB_connector.SchDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -373,7 +390,7 @@ DItemRevisionGUID=
 GenerateClassCluster=0
 DocumentUniqueId=TRPJHSNJ
 
-[Document20]
+[Document21]
 DocumentPath=USB_connector.Harness
 AnnotationEnabled=1
 AnnotateStartValue=1
@@ -395,19 +412,18 @@ UniqueId=475d752c-0aad-4116-bf74-0118f6d89662
 Description=Osazeni
 AllowFabrication=0
 ParameterCount=0
-VariationCount=12
-Variation1=Designator=R77|UniqueId=\NIJNKOAB\JPNYVFVU|Kind=0|AlternatePart=
-Variation2=Designator=R81|UniqueId=\NIJNKOAB\ANMCLQJA|Kind=1|AlternatePart=
-Variation3=Designator=R54|UniqueId=\AUVLKEPT\RUTCXKDT|Kind=1|AlternatePart=
-Variation4=Designator=R56|UniqueId=\AUVLKEPT\CRZWQFUR|Kind=1|AlternatePart=
-Variation5=Designator=R58|UniqueId=\AUVLKEPT\PWZXECST|Kind=1|AlternatePart=
-Variation6=Designator=R60|UniqueId=\AUVLKEPT\DYEOCUQQ|Kind=1|AlternatePart=
-Variation7=Designator=R62|UniqueId=\AUVLKEPT\YGHNHGND|Kind=1|AlternatePart=
-Variation8=Designator=R64|UniqueId=\AUVLKEPT\XLYAQSTR|Kind=1|AlternatePart=
-Variation9=Designator=L5|UniqueId=\SVUZSJUW\PBULUOWN\WNNNRFQJ|Kind=1|AlternatePart=
-Variation10=Designator=R?|UniqueId=\NIJNKOAB\UUVVYPEG|Kind=1|AlternatePart=
-Variation11=Designator=R?|UniqueId=\NIJNKOAB\QOIVGAXL|Kind=1|AlternatePart=
-Variation12=Designator=R?|UniqueId=\SVUZSJUW\PBULUOWN\ZXCGGKHB|Kind=1|AlternatePart=
+VariationCount=11
+Variation1=Designator=R81|UniqueId=\NIJNKOAB\ANMCLQJA|Kind=1|AlternatePart=
+Variation2=Designator=R54|UniqueId=\AUVLKEPT\RUTCXKDT|Kind=1|AlternatePart=
+Variation3=Designator=R56|UniqueId=\AUVLKEPT\CRZWQFUR|Kind=1|AlternatePart=
+Variation4=Designator=R58|UniqueId=\AUVLKEPT\PWZXECST|Kind=1|AlternatePart=
+Variation5=Designator=R60|UniqueId=\AUVLKEPT\DYEOCUQQ|Kind=1|AlternatePart=
+Variation6=Designator=R62|UniqueId=\AUVLKEPT\YGHNHGND|Kind=1|AlternatePart=
+Variation7=Designator=R64|UniqueId=\AUVLKEPT\XLYAQSTR|Kind=1|AlternatePart=
+Variation8=Designator=L5|UniqueId=\SVUZSJUW\PBULUOWN\WNNNRFQJ|Kind=1|AlternatePart=
+Variation9=Designator=R?|UniqueId=\NIJNKOAB\UUVVYPEG|Kind=1|AlternatePart=
+Variation10=Designator=R?|UniqueId=\NIJNKOAB\QOIVGAXL|Kind=1|AlternatePart=
+Variation11=Designator=R?|UniqueId=\SVUZSJUW\PBULUOWN\ZXCGGKHB|Kind=1|AlternatePart=
 ParamVariationCount=0
 
 [GeneratedDocument1]

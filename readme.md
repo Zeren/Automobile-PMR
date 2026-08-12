@@ -401,3 +401,23 @@ Generátor ST USB_DEVICE v CubeMX neumí kompozitní zařízení sestavit automa
 | **USB_VBUS**    | `PA9`         | Vstup          | **Detekce napětí 5 V z USB (VBUS Sensing).**<br><br>Kritické pro USB specifikaci, protože celé zařízení je "Self-Powered". MCU přes tento pin zjistí fyzické připojení USB kabelu k PC.<br><br>*(Poznámka pro HW: Musí být realizováno přes odporový dělič z 5 V na 3.3 V).*                                                                                                 |
 | **USB_D- / D+** | `PA11 / PA12` | AF I/O         | **Datové linky Full-Speed USB (OTG_HS).**<br><br>Integrovaný fyzický PHY. Připojeno přes ESD ochranu přímo na konektor. Slouží pro USB Audio (UAC) a sériový port (CDC).                                                                                                                                                                                                     |
 
+
+# Dynamické řízení výstupního napětí měniče TLV61047 (U3)
+
+Výstupní napětí zvyšujícího DC/DC měniče TLV61047 (U3) je dynamicky řízeno mikrokontrolérem STM32H725 pomocí metody vstřikování náboje (charge injection) do uzlu zpětné vazby (pin FB). Zdrojem řídicího signálu je hardwarový časovač **TIM3**, jehož výstup PWM je přímo mapován na pin **PC6**.
+
+**Princip činnosti a zpracování signálu:**
+
+1. **Generování a filtrace:** Časovač TIM3 generuje PWM signál o nosné frekvenci $25\text{ kHz}$. Tento signál je veden přes oddělovací rezistor $R_{31}$ do integračního kondenzátoru $C_{30}$. Vzniklá dolní propust (s mezním kmitočtem cca $35\text{ Hz}$) vyhlazuje obdélníkový průběh na čisté stejnosměrné řídicí napětí $V_{CTRL}$, jehož velikost je úměrná střídě (Duty Cycle) PWM.
+2. **Izolace smyčky:** Vyhlazené napětí $V_{CTRL}$ je přes izolační rezistor $R_{32}$ přivedeno do zpětnovazebního uzlu měniče. Fyzické oddělení kapacity $C_{30}$ rezistorem $R_{32}$ je naprosto kritické pro zachování fázové rezervy (Phase Margin) a frekvenční stability interního chybového zesilovače TLV61047.
+3. **Rovnováha uzlu FB:** V ustáleném stavu udržuje vnitřní regulační smyčka měniče na pinu FB pevné referenční napětí $V_{REF} = 1.233\text{ V}$. Výsledné výstupní napětí $V_{OUT}$ je definováno 1. Kirchhoffovým zákonem pro uzel FB:
+
+$$\frac{V_{OUT} - V_{REF}}{R_{30}} + \frac{V_{CTRL} - V_{REF}}{R_{31} + R_{32}} = \frac{V_{REF}}{R_{33}}$$
+
+**Regulační charakteristika:**
+Z výše uvedené rovnice vyplývá, že vztah mezi řídicí střídou PWM a výstupním napětím $V_{OUT}$ je **lineární a nepřímý úměrný**.
+
+* **Při střídě 0 %** ($V_{CTRL} = 0\text{ V}$) odebírá řídicí větev proud z uzlu FB. Chybový zesilovač to kompenzuje zvýšením výstupního napětí na maximální konstrukční hodnotu (cca 28.2 V).
+* **Při střídě 100 %** ($V_{CTRL} = 3.3\text{ V}$) je proud naopak vstřikován do uzlu FB, což nutí regulační smyčku snížit výstupní napětí na minimální hodnotu (cca 20.4 V).
+
+Rozlišení časovače TIM3 (čítání do hodnoty 2700) rozděluje tento rozsah na jemné kroky, kde změna střídy o 1 bit (LSB) odpovídá změně výstupního napětí o přibližně 3 mV. Tento mechanismus poskytuje rádiové části vysoce precizní a lineární řízení napájecího napětí koncového stupně, které lze jednoduše ovládat přímým zápisem do registru střídy v mikrokontroléru.
