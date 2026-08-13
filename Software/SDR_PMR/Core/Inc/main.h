@@ -71,8 +71,14 @@ void Error_Handler(void);
 #define RX_BAND_GPIO_Port GPIOC
 #define FILTER_TUNE_Pin GPIO_PIN_5
 #define FILTER_TUNE_GPIO_Port GPIOC
-#define SPI_NCS_Pin GPIO_PIN_15
-#define SPI_NCS_GPIO_Port GPIOA
+#define LNA_ON_Pin GPIO_PIN_7
+#define LNA_ON_GPIO_Port GPIOC
+#define SPI6_nCS_Pin GPIO_PIN_3
+#define SPI6_nCS_GPIO_Port GPIOB
+#define CB_nIRQ_Pin GPIO_PIN_8
+#define CB_nIRQ_GPIO_Port GPIOB
+#define CB_nRESET_Pin GPIO_PIN_9
+#define CB_nRESET_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 
