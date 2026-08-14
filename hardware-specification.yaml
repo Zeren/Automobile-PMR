@@ -1,0 +1,476 @@
+hardware_specification_manifest:
+  revision: "SDR_PMR rev.10 (final pre-layout)"
+  date: "2026-04-18"
+
+  mcu_config:
+    device: "STM32H725RGV6"
+    core: "ARM Cortex-M7 @ 544 MHz"
+    hclk: "272 MHz"
+    pclk1: "136 MHz"
+    pclk2: "136 MHz"
+    apb3_clk: "136 MHz"
+    apb4_clk: "136 MHz"
+    flash_latency: "3 WS (FLASH_ACR_LATENCY_3WS)"
+    power_supply: "PWR_DIRECT_SMPS_SUPPLY"
+    voltage_scale: "PWR_REGULATOR_VOLTAGE_SCALE0"
+    clock_source:
+      type: "HSE (Bypass from external 32 MHz TCXO via 74AC04 fanout)"
+      input_pin: "PH0 (OSC_IN)"
+      rationale: "TCXO on dedicated SMPS-powered rail +3V3_CLOCK, single-point ground, away from USB and audio analog"
+    pll1:
+      source: "HSE"
+      divm: 3
+      divn: 51
+      divp: 1
+      divq: 2
+      divr: 2
+      vcirange: "RCC_PLL1VCIRANGE_3"
+      vcosel: "RCC_PLL1VCOWIDE"
+      sysclk: "544 MHz"
+    pll3:                          # dedicated for USB 48 MHz
+      status: "Required - configure in RCC_PeriphCLKCLKInitTypeDef"
+      source: "HSE"
+      divm: 6
+      divn: 90
+      divq: 10
+      output: "48 MHz -> USB"
+    i2s_ckin:
+      source: "32 MHz from oscillator (pin PC9, AF5)"
+      kernel_clock_mux: "RCC_SPI123CLKSOURCE_PIN (affects SPI1/2/3 and I2S1/I2S2/I2S3)"
+      rationale: "Single 32 MHz reference drives MCU + radio + codec + CB module synchronously"
+    rtc: "Not populated / User may map PC14-PC15 to LSE; keep free for CB IRQ"
+
+  pinmap:
+    # format: [Pin, Signal, Direction/Type, Pull, AF, Active Level]
+    - [PA0,  "UART_CTRL_TX",      "Output, AF",    "No Pull",   "AF8_UART4",  "High"]
+    - [PA1,  "UART_CTRL_RX",      "Input, AF",     "No Pull",   "AF8_UART4",  "High"]
+    - [PA2,  "PTT_TO_MCU",        "Input",         "Pull-Up",   "GPIO",       "Low (0 = TX)"]
+    - [PA3,  "PTT_LED",           "Output",        "No Pull",   "GPIO",       "High (1 = LED on)"]
+    - [PA4,  "RADIO_WS",          "Input, AF",     "No Pull",   "AF5_I2S1",   "Low/High"]
+    - [PA5,  "RADIO_CLK",         "Input, AF",     "No Pull",   "AF5_I2S1",   "Rising Edge"]
+    - [PA6,  "RADIO_DIN",         "Input, AF",     "No Pull",   "AF5_I2S1",   "Data (SDI)"]
+    - [PA7,  "RADIO_DOUT",        "Output, AF",    "No Pull",   "AF5_I2S1",   "Data (SDO)"]
+    - [PA8,  "USB_SOF",           "Input",         "No Pull",   "AF10_USB",   "High (optional SOF signal)"]
+    - [PA9,  "USB_VUSB",          "Input",         "No Pull",   "GPIO (in USB stack treated as VBUS sensing)", "High"]
+    - [PA11, "USB_D_N",           "I/O, AF",       "No Pull",   "AF10_USB",   "Diff"]
+    - [PA12, "USB_D_P",           "I/O, AF",       "No Pull",   "AF10_USB",   "Diff"]
+    - [PA13, "SWDIO",             "I/O, AF",       "No Pull",   "AF0_SWD",    "High (ST-Link)"]
+    - [PA14, "SWCLK",             "Input, AF",     "Pull-Up (ext to +3V3_MCU via 100k)", "AF0_SWD", "High (ST-Link)"]
+    - [PB3,  "SPI6_nCS",          "Output",        "No Pull",   "GPIO",       "Low-active (SPI6 NSS for SX1255)"]
+    - [PB4,  "RADIO_SPI_MISO",    "Input, AF",     "No Pull",   "AF7_SPI6",   "Data (MISO)"]
+    - [PB6,  "I2C_SCL",           "I/O, OD",       "No Pull (ext 4k7 to +3V3_MCU)", "AF4_I2C1", "High"]
+    - [PB7,  "I2C_SDA",           "I/O, OD",       "No Pull (ext 4k7 to +3V3_MCU)", "AF4_I2C1", "High"]
+    - [PB8,  "CB_nIRQ",           "Input",         "Pull-Up (ext 4k7 to +3V3_MCU)", "GPIO_EXTI", "Low-active (falling edge)"]
+    - [PB9,  "CB_nRESET",         "Output",        "No Pull",   "GPIO",       "Low-active (reset)"]
+    - [PB10, "I2S0_SCLK",         "Output, AF",    "No Pull",   "AF5_I2S2",   "Rising/Falling Edge"]
+    - [PB12, "I2S0_WS",           "Output, AF",    "No Pull",   "AF5_I2S2",   "Low/High"]
+    - [PB13, "UART_DEBUG_TX",     "Output, AF",    "No Pull",   "AF14_UART5", "High"]
+    - [PB14, "I2S0_SDI",          "Input, AF",     "No Pull",   "AF5_I2S2",   "Data (SDI)"]
+    - [PB15, "I2S0_SDO",          "Output, AF",    "No Pull",   "AF5_I2S2",   "Data (SDO)"]
+    - [PC0,  "RADIO_RESET",       "In/Out (GPIO)", "No Pull",   "GPIO",       "Low-active (open-drain emulation, see quirks)"]
+    - [PC1,  "PA_BIAS_ON",        "Output",        "No Pull (ext 100k pull-down for safe RX at boot)", "GPIO", "High (1 = TX)"]
+    - [PC4,  "RX_BAND",           "Output",        "No Pull",   "GPIO",       "Low=PMR/shared, High=70cm"]
+    - [PC5,  "FILTER_TUNE",       "Output",        "No Pull",   "GPIO",       "High=service port J3"]
+    - [PC6,  "MCU 30V CTRL",      "Output, AF",    "No Pull",   "AF2_TIM3_CH1", "PWM"]
+    - [PC7,  "LNA_ON",            "Output",        "No Pull (ext 100k pull-down for default bypass)", "GPIO", "High = active (PGA-103+ on), POR default Low = bypass"]
+    - [PC9,  "I2S_CKIN",          "Input, AF",     "No Pull",   "AF5_SPI1",   "32 MHz"]
+    - [PC10, "CB_CLK (I2S3_CK)",  "Output, AF",    "No Pull",   "AF6_SPI3",   "Rising/Falling Edge"]
+    - [PC11, "CB_DIN (I2S3_SD)",  "Input, AF",     "No Pull",   "AF6_SPI3",   "Data (SDI)"]
+    - [PC12, "RADIO_SPI_SCLK",    "Output, AF",    "No Pull",   "AF5_SPI6",   "Rising Edge (mode 0)"]
+    - [PD2,  "UART_DEBUG_RX",     "Input, AF",     "No Pull (ext 4k7 series connector)", "AF14_UART5", "High"]
+    - [PH0,  "OSC_IN (HSE)",      "Analog",        "No Pull",   "HSE Bypass", "32 MHz square"]
+
+  peripherals:
+    I2S1:
+      role: "SX1255 radio baseband (RX/TX I/Q data)"
+      instance: "SPI1 (I2S mode)"
+      mode: "I2S_MODE_SLAVE_FULLDUPLEX"
+      standard: "I2S_STANDARD_PHILIPS"
+      data_format: "I2S_DATAFORMAT_16B (16-bit L+Q in one frame)"
+      audio_freq: "20833 Hz (target), actual 20.833 kHz from 32 MHz / 1536"
+      clock_polarity: "I2S_CPOL_LOW"
+      bclk_relation: "External - driven by SX1255 CLK_OUT (666.67 kHz, 32 MHz / 48)"
+      sync: "SX1255 is clock master; MCU must be slave"
+      ws_relation: "WS low = I sample, WS high = Q sample (matches Philips convention)"
+      mcu_notes: "Do not change AudioFreq once SX1255 external clock is active; reconfigure SX1255 instead"
+      dma:
+        - channel: "DMA1 Stream 0"
+          direction: "Peripheral -> Memory (RX I/Q)"
+          request: "DMA_REQUEST_SPI1_RX"
+          mode: "Circular double-buffer"
+          data_width: "HalfWord (16 bit), MEMINC, ALIGN halfword"
+          priority: "High"
+        - channel: "DMA1 Stream 1"
+          direction: "Memory -> Peripheral (TX I/Q)"
+          request: "DMA_REQUEST_SPI1_TX"
+          mode: "Circular double-buffer"
+          data_width: "HalfWord (16 bit), MEMINC, ALIGN halfword"
+          priority: "High"
+
+    I2S2:
+      role: "TAC5142 audio codec"
+      instance: "SPI2 (I2S mode)"
+      mode: "I2S_MODE_MASTER_FULLDUPLEX"
+      standard: "I2S_STANDARD_PHILIPS"
+      data_format: "I2S_DATAFORMAT_32B (32-bit per channel, 64 BCLK/frame)"
+      audio_freq: "20833 Hz"
+      bclk: "1.3333 MHz (32 MHz / 24)"
+      kernel_clock: "RCC_SPI123CLKSOURCE_PIN (i2s_ckin = 32 MHz)"
+      mcu_notes: "MCU is master; MD0-MD5 on codec are latched at power-up (see quirks); changing codec mode requires power cycle"
+      dma:
+        - channel: "DMA1 Stream 2"
+          direction: "Memory -> Peripheral (TX audio)"
+          request: "DMA_REQUEST_SPI2_TX"
+          mode: "Circular double-buffer"
+          data_width: "Word (32 bit)"
+          priority: "Medium"
+        - channel: "DMA1 Stream 3"
+          direction: "Peripheral -> Memory (RX audio)"
+          request: "DMA_REQUEST_SPI2_RX"
+          mode: "Circular double-buffer"
+          data_width: "Word (32 bit)"
+          priority: "Medium"
+
+    I2S3:
+      role: "CB radio module (I/Q streaming)"
+      instance: "SPI3 (I2S mode)"
+      mode: "I2S_MODE_MASTER_FULLDUPLEX (CB slave expected; if CB in Mode B2, change to SLAVE)"
+      standard: "I2S_STANDARD_PHILIPS"
+      data_format: "I2S_DATAFORMAT_32B"
+      audio_freq: "20833 Hz"
+      kernel_clock: "i2s_ckin = 32 MHz"
+      mcu_notes: "Asynchronous UAC math: send 21 samples, sometimes 20, per 1 ms SOF"
+      dma:
+        - channel: "DMA2 Stream 0"
+          direction: "Peripheral -> Memory (CB RX)"
+          request: "DMA_REQUEST_SPI3_RX"
+          mode: "Circular double-buffer"
+          data_width: "Word (32 bit)"
+          priority: "High"
+        - channel: "DMA2 Stream 1"
+          direction: "Memory -> Peripheral (CB TX)"
+          request: "DMA_REQUEST_SPI3_TX"
+          mode: "Circular double-buffer"
+          data_width: "Word (32 bit)"
+          priority: "High"
+
+    SPI6:
+      role: "SX1255 register interface (config/control)"
+      instance: "SPI6"
+      mode: "Full-Duplex Master"
+      data_size: "8 bit"
+      first_bit: "MSB First"
+      clock_polarity: "Low"
+      clock_phase: "1 Edge"
+      kernel_clock: "APB2 = 136 MHz"
+      baud: "Prescaler DIV16 -> 8.5 MHz (limit SX1255 = 10 MHz)"
+      nss: "SPI_NSS_SOFT, driven manually on PB3 (SPI6_nCS)"
+      timing_limits:
+        t_nsetup: ">= 30 ns NSS fall to first SCK rise"
+        t_nhold: ">= 50 ns last SCK fall to NSS rise"
+        t_nhigh: ">= 20 ns NSS high between transactions"
+      dma:
+        - channel: "DMA2 Stream 2"
+          direction: "Memory -> Peripheral"
+          request: "DMA_REQUEST_SPI6_TX"
+          mode: "Normal burst for register writes"
+          data_width: "Byte"
+          priority: "Low"
+        - channel: "DMA2 Stream 3"
+          direction: "Peripheral -> Memory"
+          request: "DMA_REQUEST_SPI6_RX"
+          mode: "Normal burst for register reads"
+          data_width: "Byte"
+          priority: "Low"
+
+    I2C1:
+      role: "Codec MD pins (hardwired - no I2C addr), CB module control, J15/J16 expander"
+      instance: "I2C1"
+      timing: "0xA0303048 (Standard Mode ~100 kHz @136 MHz kernel)"
+      addressing: "7-bit"
+      pull_up: "4k7 to +3V3_MCU on SCL/SDA"
+      analog_filter: "Enabled"
+      digital_filter: "0x0"
+      notes: "No I2C slaves on board (TAC5142 uses HW MD pins); CB module acts as slave (address TBD)"
+      dma: "Not required; 100 kHz application-layer polling sufficient"
+
+    UART4:
+      role: "External control panel"
+      instance: "UART4"
+      baud: "115200"
+      word_length: "8B"
+      stop_bits: "1"
+      parity: "None"
+      hw_flow: "None"
+      dma:
+        - channel: "DMA2 Stream 4"
+          direction: "Peripheral -> Memory (panel RX)"
+          request: "DMA_REQUEST_UART4_RX"
+          mode: "Idle-line based circular"
+          data_width: "Byte"
+          priority: "Medium"
+        - channel: "DMA2 Stream 5"
+          direction: "Memory -> Peripheral (panel TX)"
+          request: "DMA_REQUEST_UART4_TX"
+          mode: "Normal burst"
+          data_width: "Byte"
+          priority: "Medium"
+
+    UART5:
+      role: "Debug / logging console (service port J5)"
+      instance: "UART5"
+      baud: "115200"
+      word_length: "8B"
+      stop_bits: "1"
+      parity: "None"
+      hw_flow: "None"
+      dma:
+        - channel: "DMA2 Stream 6"
+          direction: "Peripheral -> Memory (debug RX)"
+          request: "DMA_REQUEST_UART5_RX"
+          mode: "Idle-line based circular"
+          data_width: "Byte"
+          priority: "Low"
+        - channel: "DMA2 Stream 7"
+          direction: "Memory -> Peripheral (debug TX)"
+          request: "DMA_REQUEST_UART5_TX"
+          mode: "Normal burst"
+          data_width: "Byte"
+          priority: "Low"
+
+    TIM3:
+      role: "Class-G audio rail control (+30 V PWM to TLV61047 FB)"
+      instance: "TIM3"
+      channel: "CH1 (PC6)"
+      mode: "PWM1"
+      prescaler: "3"
+      period: "2719"
+      frequency: "25 kHz"
+      auto_reload_preload: "Enabled"
+      pulse_initial: "0 (duty = 0 %)"
+      action: "Set duty once +5V and +3V3 rails are stable (PG_5V + PG_3V3)"
+
+    USB_OTG_HS:
+      speed: "Full-Speed (embedded PHY)"
+      phy_itface: "USB_OTG_EMBEDDED_PHY"
+      dev_endpoints: 9
+      dma_enable: "ENABLE"
+      sof_enable: "ENABLE (1 ms SOF interrupt for async UAC)"
+      vbus_sensing_enable: "ENABLE"
+      use_external_vbus: "DISABLE"
+      clock_source: "PLL3Q = 48 MHz (configure in RCC_PeriphCLKCLKInitTypeDef)"
+      role: "Composite UAC 1.0 (async IN/OUT) + CDC (CAT)"
+      async_note: "Audio endpoint: mostly 21 samples, sometimes 20 per 1 ms SOF frame (20.833 kHz native)"
+
+  power_and_reset:
+    input_protection:
+      fuse: "F1 4 A fast (0458004.DR) on +26 V input"
+      tvs: "SMDJ33A (33 V standoff)"
+      note: "CB module on J16 draws from same +26 V rail; layout sized for >= 3 A, fuse intentionally headroom +2 A"
+    buck_5v:
+      ic: "SIC479ED (U2)"
+      en: "Driven high by input rail divider (R20/R22 52k3/10k)"
+      pg_signal: "PG_5V (open-drain, pull-up 100k to VDD) -> drives D3 green LED + enables downstream rails"
+    ldo_rails:
+      codec_3v3:
+        ic: "LDK320M33R (U17)"
+        en: "PG_5V"
+        settling: ">= 200 us recommended start-up typical (see LDK320 data)"
+      rf_3v3:
+        ic: "LDK320M33R (U18)"
+        en: "PG_5V"
+        note: "Powers SX1255 + RF switches + LNA"
+      clock_3v3:
+        ic: "LDK320M33R (U22)"
+        en: "Tied to IN (always-on with 5 V)"
+        rationale: "Reference oscillator must not be sequenced with other rails; separate filtering (FR6)"
+    boost_30v:
+      ic: "TLV61047 (U3)"
+      en: "PG_5V"
+      control: "PWM from PC6 (TIM3_CH1) modulates FB for class-G; clamp duty in SW (max ~28 V)"
+    mcu_core:
+      supply: "Internal Direct SMPS (L14 2R2, VCAP bank)"
+      config_const: "PWR_DIRECT_SMPS_SUPPLY, VOS0"
+    reset_sequence:
+      - step: 1
+        action: "Input +26 V -> F1 -> SIC479 buck -> +5 V"
+      - step: 2
+        action: "SIC479 PGOOD -> +3V3_MCU, +3V3_CODEC, +3V3_RF, +30V_EN; clock rail comes up with 5 V"
+      - step: 3
+        action: "Codec MD pins latch at power-up (see quirks): ensure VDD stable within 2 ms, keep clocks stopped until init"
+      - step: 4
+        action: "Release MCU NRST (external pull-up 4k7 to +3V3_MCU, cap 10n to GND)"
+      - step: 5
+        action: "Release SX1255 reset (see quirks for open-drain emulation on PC0): wait 5 ms before first SPI transaction"
+      - step: 6
+        action: "Wait PG_5V + PG_3V3 -> start TIM3 PWM (class-G) -> enable PA_BIAS_ON / LNA_ON / RX_BAND / FILTER_TUNE logic as needed"
+    watchdog:
+      present: false
+      note: "Add IWDG in FW optional; no external watchdog IC fitted"
+    low_power:
+      note: "SX1255 sleeps: current ~0.2 uA (typ); wake via ref_enable 0->1 transition + 5 ms; codec enters sleep on clock stop (< 1.5 mA)"
+
+  interrupts:
+    - name: "SPI1_RX_DMA"
+      source: "I2S1 RX I/Q data (SX1255)"
+      handler: "DMA1 Stream 0 IRQHandler"
+      priority: 3
+      rationale: "20.83 kHz I/Q streaming - critical path"
+    - name: "SPI1_TX_DMA"
+      source: "I2S1 TX I/Q data (SX1255)"
+      handler: "DMA1 Stream 1 IRQHandler"
+      priority: 3
+      rationale: "TX must never underrun; same priority as RX"
+    - name: "SPI2_RX_DMA"
+      source: "I2S2 audio RX (codec)"
+      handler: "DMA1 Stream 3 IRQHandler"
+      priority: 4
+    - name: "SPI2_TX_DMA"
+      source: "I2S2 audio TX (codec)"
+      handler: "DMA1 Stream 2 IRQHandler"
+      priority: 4
+    - name: "SPI6_TX/RX"
+      source: "SX1255 register ops"
+      handler: "Polling in application (low urgency)"
+      priority: 6
+    - name: "CB_nIRQ"
+      source: "CB module interrupt (PB8)"
+      handler: "EXTI9_5_IRQHandler"
+      priority: 2
+      trigger: "Falling edge"
+      action: "Schedule I2C read of CB status registers"
+    - name: "USB_OTG_HS"
+      handler: "OTG_HS_IRQHandler"
+      priority: 3
+      note: "SOF interrupt (1 ms) required for async UAC descriptor updates"
+    - name: "UART4 (control panel)"
+      handler: "UART4_IRQHandler + DMA2 Stream 4/5 IRQ"
+      priority: 5
+    - name: "UART5 (debug)"
+      handler: "UART5_IRQHandler + DMA2 Stream 6/7 IRQ"
+      priority: 7
+    - name: "TIM3"
+      note: "No interrupts required; class-G PWM free-running"
+
+  dma_channel_map:
+    explanation: "Suggested allocation across DMA1/DMA2 to avoid USART/SPI/I2S conflicts; verify exact stream numbers via DMA_REQUEST_* defines on your H7 sub-family"
+    dma1:
+      - stream: 0
+        request: "DMA_REQUEST_SPI1_RX"
+        direction: "Peripheral-to-Memory"
+        peripheral: "I2S1 RX"
+        prio: "High"
+      - stream: 1
+        request: "DMA_REQUEST_SPI1_TX"
+        direction: "Memory-to-Peripheral"
+        peripheral: "I2S1 TX"
+        prio: "High"
+      - stream: 2
+        request: "DMA_REQUEST_SPI2_TX"
+        direction: "Memory-to-Peripheral"
+        peripheral: "I2S2 TX"
+        prio: "Medium"
+      - stream: 3
+        request: "DMA_REQUEST_SPI2_RX"
+        direction: "Peripheral-to-Memory"
+        peripheral: "I2S2 RX"
+        prio: "Medium"
+    dma2:
+      - stream: 0
+        request: "DMA_REQUEST_SPI3_RX"
+        direction: "Peripheral-to-Memory"
+        peripheral: "I2S3 RX"
+        prio: "High"
+      - stream: 1
+        request: "DMA_REQUEST_SPI3_TX"
+        direction: "Memory-to-Peripheral"
+        peripheral: "I2S3 TX"
+        prio: "High"
+      - stream: 2
+        request: "DMA_REQUEST_SPI6_TX"
+        direction: "Memory-to-Peripheral"
+        peripheral: "SPI6 TX"
+        prio: "Low"
+      - stream: 3
+        request: "DMA_REQUEST_SPI6_RX"
+        direction: "Peripheral-to-Memory"
+        peripheral: "SPI6 RX"
+        prio: "Low"
+      - stream: 4
+        request: "DMA_REQUEST_UART4_RX"
+        direction: "Peripheral-to-Memory"
+        peripheral: "UART4 RX"
+        prio: "Medium"
+      - stream: 5
+        request: "DMA_REQUEST_UART4_TX"
+        direction: "Memory-to-Peripheral"
+        peripheral: "UART4 TX"
+        prio: "Medium"
+      - stream: 6
+        request: "DMA_REQUEST_UART5_RX"
+        direction: "Peripheral-to-Memory"
+        peripheral: "UART5 RX"
+        prio: "Low"
+      - stream: 7
+        request: "DMA_REQUEST_UART5_TX"
+        direction: "Memory-to-Peripheral"
+        peripheral: "UART5 TX"
+        prio: "Low"
+    notes:
+      - "If your DMA channel numbering differs, remap while keeping I2S1 on the highest-priority streams, then I2S3, then I2S2."
+      - "For I2S RX/TX use circular double-buffer (half-word for I2S1, word for I2S2/3), enable Half-Transfer and Transfer-Complete callbacks."
+
+  cubemx_checklist:
+    - "Ctl: RCC > High Speed Clock (HSE) = Crystal/Ceramic Resonator Bypass; Frequency = 32 MHz"
+    - "Ctl: RCC > PLL1: M=3, N=51, P=1, Q=2, R=2, VCIRANGE=3, VCOWIDE; Clocks: HCLK=DIV2, APB1/2/3/4=DIV2"
+    - "Ctl: RCC > Peripherals: USB Clock = PLL3Q; PLL3: M=6, N=90, Q=10 (48 MHz)"
+    - "Ctl: RCC > SPI123 Kernel Clock = I2S_CKIN (pin PC9)"
+    - "Ctl: SYS > Debug = Serial Wire (do NOT enable JTAG; pins PA15/PB3/PB4 are reused)"
+    - "I2S1: MODE_SLAVE_FULLDUPLEX, Standard Philips, Data 16b, Audio Freq = 20833, WS Inv = Disabled"
+    - "I2S2: MODE_MASTER_FULLDUPLEX, Standard Philips, Data 32b, Audio Freq = 20833, Kernel CLK = i2s_ckin"
+    - "I2S3: (CB) Same as I2S2; if CB is clock master, switch to MODE_SLAVE_FULLDUPLEX"
+    - "SPI6: Full-Duplex Master, 8-bit, MSB, CPOL=Low, CPHA=1 Edge, Baud Prescaler = DIV16, NSS = SOFT (GPIO PB3)"
+    - "I2C1: Standard Mode, Timing = 0xA0303048, AnalogFilter = Enabled, DigitalFilter = 0x0"
+    - "UART4 / UART5: 115200 8N1, No flow control"
+    - "TIM3: CH1 = PWM Generation, Auto-reload preload On, ARR = 2719, PSC = 3 (25 kHz)"
+    - "GPIO: PC0 (open-drain emulation), PC1 (PA_BIAS_ON, ext pull-down), PC4 (RX_BAND), PC5 (FILTER_TUNE), PC7 (LNA_ON, ext pull-down), PB8 (CB_nIRQ, EXTI falling + pull-up), PB9 (CB_nRESET, init High)"
+    - "GPIO Startup levels: PA_BIAS_ON = Low, RX_BAND = Low, FILTER_TUNE = Low, LNA_ON = Low, PTT_LED = Low, CB_nRESET = High, SPI6_nCS = High"
+    - "USB OTG HS: Device Only, Speed = Full Speed, PHY = Embedded, SOF interrupt Enabled, VBUS sensing Enabled, External VBUS = Disabled; Class = Composite Device (UAC + CDC)"
+    - "DMA: see dma_channel_map in this manifest; enable Half-Transfer and Transfer-Complete callbacks for I2S streams"
+
+  quirks:
+    - name: "SX1255 Reset Open-Drain Emulation"
+      description: >
+        SX1255 reset input is wired directly to MCU PC0 with no series diode/FET. Firmware MUST emulate open-drain: drive PC0 Output PP=1 for 100 us, then revert to Input Floating so the chip's internal pull-down (~20k) asserts reset. Never drive PC0 Low (would create contention with SX1255 internal pull).
+        After floating high for 100 us, delay 5 ms before any SPI traffic.
+    - name: "Codec MD Pin Latching"
+      description: "TAC5142 MD0..MD5 are latched at power-up; MD0 must be stable within 2 ms of rails. Changing any MD pin requires a full power-cycle (not MCU reset) of just the codec rail (+3V3_CODEC)."
+    - name: "Codec Clocks -> Sleep"
+      description: "Stopping BCLK/FSYNC puts TAC5142 into sleep mode (<1.5 mA). Suitable for TX_IDLE and audio-off states; re-apply clocks to wake."
+    - name: "PTT LED Drive"
+      description: "PTT_LED (PA3) is High-active: 1 = red LED ON, 0 = OFF. This is inverted from typical naming; handle accordingly in UI code."
+    - name: "PA Bias Safe State"
+      description: "PA_BIAS_ON (PC1) has an external 100k pull-down. At power-on or MCU reset, PC1 floats High-Z and PA bias stays OFF, avoiding an unwanted TX burst."
+    - name: "LNA Bypass Safe State"
+      description: "LNA_ON (PC7) has an external 100k pull-down. Default (post-reset) = LNA bypassed. This is intentional; in-field LNA control is measured-based, never assume boot power = LNA on."
+    - name: "SPI NSS Burst Mode"
+      description: "SX1255 SPI NSS_PB3 must be held low across the complete BURST transaction (not per-byte). Drive from HAL_SPI_TransmitReceive with manual chip-select framing: LOW -> n bytes -> HIGH."
+    - name: "Async UAC Rate Mismatch"
+      description: "Hardware sample rate is 20.833 kHz, not a standard USB rate. Descriptor must advertise a compatible burst distribution (21 samples * (1-x) + 20 samples * x per 1 ms SOF), never a fixed 24 kHz."
+    - name: "NRST External Pull"
+      description: "MCU NRST has 4k7 pull-up + 10 nF cap to GND; do not rely on ST internal reset alone; external supervisor not fitted."
+    - name: "Clock Fanout Unused Inverter Inputs"
+      description: "Unused inputs of U23 (5A, 6A) are tied to GND in hardware; outputs 5Y/6Y are floating, which is intentional (no driver).
+    - name: "CB Module Hot Plug"
+      description: "J16 supplies +26 V, +5 V, and 32 MHz; do not assume CB module state matches MCU state after re-plug; re-read CB_nRESET and re-broadcast 32 MHz reference confirmation."
+
+  pin_summary:
+    total_used: 38
+    free_pins:
+      - [PC14, "RTC/LSE or future CB GPIO"]
+      - [PC15, "RTC/LSE or future CB GPIO"]
+      - [PA10, "Spare / future CB RESET or IRQ mux"]
+      - [PB5,  "Spare"]
+      - [PB0,  "Spare (used by BOOT0, confirm post-boot available)"]
+      - [PB1,  "Spare"]
+      - [PB2,  "Spare"]
